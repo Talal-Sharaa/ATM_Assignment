@@ -2,9 +2,13 @@
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 using System.IO;
+using System.ComponentModel;
+using System.Xml.Linq;
+using System.Collections.Generic;
 
 namespace ATM_Assignment
 {
+    [Serializable]
     public class Person
     {
     }
@@ -28,12 +32,13 @@ namespace ATM_Assignment
     }
     public class Bank 
     {
-        static int count;
+        static List<BankAccount> bankAccounts = new List<BankAccount>();
+        int balance = 0;
         public Bank() {}
         public Bank(int bankCapacity) { }
         public void AddNewAccount(BankAccount tmpAccount)
         {
-            count++;
+            bankAccounts.Add(tmpAccount);
             if (tmpAccount is null)
             {
                 throw new ArgumentNullException(nameof(tmpAccount));
@@ -41,10 +46,31 @@ namespace ATM_Assignment
         }
         public int NumberOfCustomers() 
         { 
-            return count;
+            return bankAccounts.Count;
         }
 
         public bool IsBankUser(string cardNumber, string pinCode)
+        {  
+            if (string.IsNullOrEmpty(cardNumber))
+            {
+                throw new ArgumentException($"'{nameof(cardNumber)}' cannot be null or empty.", nameof(cardNumber));
+            }
+
+            if (string.IsNullOrEmpty(pinCode))
+            {
+                throw new ArgumentException($"'{nameof(pinCode)}' cannot be null or empty.", nameof(pinCode));
+            }
+            for (int i = 0; i < bankAccounts.Count; i++)
+            {
+                if (bankAccounts[i].CardNumber == cardNumber && bankAccounts[i].PinCode == pinCode)
+                {
+                    return true;
+                }
+            }
+            return false;
+
+        }
+        public int CheckBalance(string cardNumber, string pinCode)
         {
             if (string.IsNullOrEmpty(cardNumber))
             {
@@ -56,21 +82,7 @@ namespace ATM_Assignment
                 throw new ArgumentException($"'{nameof(pinCode)}' cannot be null or empty.", nameof(pinCode));
             }
 
-            return false;
-        }
-        public int CheckBalance(string CardNumber, string pinCode)
-        {
-            if (string.IsNullOrEmpty(CardNumber))
-            {
-                throw new ArgumentException($"'{nameof(CardNumber)}' cannot be null or empty.", nameof(CardNumber));
-            }
-
-            if (string.IsNullOrEmpty(pinCode))
-            {
-                throw new ArgumentException($"'{nameof(pinCode)}' cannot be null or empty.", nameof(pinCode));
-            }
-
-            return 100;
+            return balance;
         }
         public void Withdraw(BankAccount bankAccount, int withdrawAmount)
         {
@@ -86,11 +98,24 @@ namespace ATM_Assignment
                 throw new ArgumentNullException(nameof(bankAccount));
             }
         }
-        public void Save()
+        public void Save(BankAccount bankAccount)
         {
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream("MyFile.bin", FileMode.Append, FileAccess.Write, FileShare.None);
+            formatter.Serialize(stream, bankAccount);
+            stream.Close();
         }
         public void Load()
         {
+            List<BankAccount> bankAccounts = new List<BankAccount>();
+            IFormatter formatter = new BinaryFormatter();
+            Stream stream = new FileStream("MyFile.bin", FileMode.Open, FileAccess.Read, FileShare.Read);
+            while (stream.Position < stream.Length)
+            {
+                BankAccount bankAccount = (BankAccount)formatter.Deserialize(stream);
+                bankAccounts.Add(bankAccount);
+            }
+            stream.Close();
         }
     }
 
@@ -113,25 +138,42 @@ namespace ATM_Assignment
                 if(userName == "Admin" && password == "1234")
                 {
                     int bankCapacity = 10;
-                    Console.WriteLine("Enter the Credit Card Number");
-                    string cardNumber = Console.ReadLine();
-                    Console.WriteLine("Enter the Pin Code");
-                    string pinCode = Console.ReadLine();
-                    Console.WriteLine("Enter user Email");
-                    string email = Console.ReadLine();
-                    Person person= new Person();
-                    BankAccount bankAccount = new BankAccount(person, email, cardNumber, pinCode, 0);
-                    Bank bank = new Bank(bankCapacity);
-                    bank.AddNewAccount(bankAccount);
-                    IFormatter formatter = new BinaryFormatter();
-                    Stream stream = new FileStream("MyFile.bin", FileMode.Create, FileAccess.Write, FileShare.None);
-                    formatter.Serialize(stream, bankAccount);
-                    stream.Close();
+                    string addUser = "y";
+                    while (addUser == "y")
+                    {
+
+                        Console.WriteLine("Enter the Credit Card Number");
+                        string cardNumber = Console.ReadLine();
+                        Console.WriteLine("Enter the Pin Code");
+                        string pinCode = Console.ReadLine();
+                        Console.WriteLine("Enter user Email");
+                        string email = Console.ReadLine();
+                        Person person = new Person();
+                        BankAccount bankAccount = new BankAccount(person, email, cardNumber, pinCode, 0);
+                        Bank bank = new Bank(bankCapacity);
+                        bank.AddNewAccount(bankAccount);
+                        bank.Save(bankAccount);
+                        Console.WriteLine("Do you want to add another user?");
+                        addUser= Console.ReadLine();
+                        if (bank.NumberOfCustomers() >= 10)
+                        {
+                            Console.WriteLine("Bank already full");
+                            break;
+                        }
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Wrong username or password");
+                    Console.WriteLine("Wrong Admin username or password");
                 }
+            }
+
+            if (select == 2)
+            {
+                Console.WriteLine("Please Enter Your Card Number");
+                string cardNumber = Console.ReadLine();
+                Console.WriteLine("Please Enter Your Pin Code");
+                string pinCode = Console.ReadLine();
             }
         }
     }

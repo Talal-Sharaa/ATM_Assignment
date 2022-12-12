@@ -174,7 +174,7 @@ namespace ATM_TESTS
 
             testBank.AddNewAccount(tmpAccount);
 
-            testBank.Save();
+            testBank.Save(tmpAccount);
 
             Bank newTestBank = new Bank();
             newTestBank.Load();
