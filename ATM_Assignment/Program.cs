@@ -33,7 +33,6 @@ namespace ATM_Assignment
     public class Bank 
     {
         static List<BankAccount> bankAccounts = new List<BankAccount>();
-        int balance = 0;
         public Bank() {}
         public Bank(int bankCapacity) { }
         public void AddNewAccount(BankAccount tmpAccount)
@@ -72,6 +71,7 @@ namespace ATM_Assignment
         }
         public int CheckBalance(string cardNumber, string pinCode)
         {
+
             if (string.IsNullOrEmpty(cardNumber))
             {
                 throw new ArgumentException($"'{nameof(cardNumber)}' cannot be null or empty.", nameof(cardNumber));
@@ -81,8 +81,14 @@ namespace ATM_Assignment
             {
                 throw new ArgumentException($"'{nameof(pinCode)}' cannot be null or empty.", nameof(pinCode));
             }
-
-            return balance;
+            for (int i = 0; i < bankAccounts.Count; i++)
+            {
+                if (bankAccounts[i].CardNumber == cardNumber && bankAccounts[i].PinCode == pinCode)
+                {
+                    return bankAccounts[i].AccountBalance;
+                }
+            }
+            return 0;
         }
         public void Withdraw(BankAccount bankAccount, int withdrawAmount)
         {
@@ -90,6 +96,8 @@ namespace ATM_Assignment
             {
                 throw new ArgumentNullException(nameof(bankAccount));
             }
+            bankAccount.AccountBalance = bankAccount.AccountBalance - withdrawAmount;
+
         }
         public void Deposit(BankAccount bankAccount, int depositamount)
         {
@@ -97,6 +105,7 @@ namespace ATM_Assignment
             {
                 throw new ArgumentNullException(nameof(bankAccount));
             }
+            bankAccount.AccountBalance = bankAccount.AccountBalance + depositamount;
         }
         public void Save(BankAccount bankAccount)
         {
@@ -107,7 +116,6 @@ namespace ATM_Assignment
         }
         public void Load()
         {
-            List<BankAccount> bankAccounts = new List<BankAccount>();
             IFormatter formatter = new BinaryFormatter();
             Stream stream = new FileStream("MyFile.bin", FileMode.Open, FileAccess.Read, FileShare.Read);
             while (stream.Position < stream.Length)
@@ -123,6 +131,8 @@ namespace ATM_Assignment
     {
         static void Main(string[] args)
         {
+            Bank bank1= new Bank();
+            bank1.Load();
             Console.WriteLine("Please select an option");
             Console.WriteLine("1- Add A new Account");
             Console.WriteLine("2- Check Account Balance");
@@ -174,6 +184,95 @@ namespace ATM_Assignment
                 string cardNumber = Console.ReadLine();
                 Console.WriteLine("Please Enter Your Pin Code");
                 string pinCode = Console.ReadLine();
+                Bank bank = new Bank();
+                if (bank.IsBankUser(cardNumber, pinCode))
+                {
+                    Console.WriteLine(bank.CheckBalance(cardNumber, pinCode));
+                }
+                else
+                {
+                    Console.WriteLine("Wrong Card number or Pin code");
+                }
+            }
+            if (select == 3)
+            {
+                Console.WriteLine("Please Enter Your Card Number");
+                string cardNumber = Console.ReadLine();
+                Console.WriteLine("Please Enter Your Pin Code");
+                string pinCode = Console.ReadLine();
+                Bank bank = new Bank();
+                if (bank.IsBankUser(cardNumber, pinCode))
+                {
+                    Console.WriteLine("Enter Amount of deposit");
+                    int deposit = int.Parse(Console.ReadLine()); 
+                    List<BankAccount> bankAccounts = new List<BankAccount>();
+                    IFormatter formatter = new BinaryFormatter();
+                    Stream stream = new FileStream("MyFile.bin", FileMode.Open, FileAccess.Read, FileShare.Read);
+                    while (stream.Position < stream.Length)
+                    {
+                        BankAccount bankAccount = (BankAccount)formatter.Deserialize(stream);
+                        bankAccounts.Add(bankAccount);
+                    }
+                    stream.Close();
+                    for(int i = 0; i < bankAccounts.Count; i++)
+                    {
+                        if (bankAccounts[i].CardNumber== cardNumber && bankAccounts[i].PinCode == pinCode) 
+                        {
+                            bank.Deposit(bankAccounts[i], deposit);
+                        }
+                    }
+                    for(int i = 0; i < bankAccounts.Count; i++)
+                    {
+                        IFormatter formatter1 = new BinaryFormatter();
+                        Stream stream1 = new FileStream("MyFile.bin", FileMode.Create, FileAccess.Write, FileShare.None);
+                        formatter.Serialize(stream1, bankAccounts[i]);
+                    }
+                    stream.Close();
+                }
+                else
+                {
+                    Console.WriteLine("Wrong Card number or Pin code");
+                }
+            }
+            if (select == 4)
+            {
+                Console.WriteLine("Please Enter Your Card Number");
+                string cardNumber = Console.ReadLine();
+                Console.WriteLine("Please Enter Your Pin Code");
+                string pinCode = Console.ReadLine();
+                Bank bank = new Bank();
+                if (bank.IsBankUser(cardNumber, pinCode))
+                {
+                    Console.WriteLine("Enter Amount of withdrawl");
+                    int withdraw = int.Parse(Console.ReadLine());
+                    List<BankAccount> bankAccounts = new List<BankAccount>();
+                    IFormatter formatter = new BinaryFormatter();
+                    Stream stream = new FileStream("MyFile.bin", FileMode.Open, FileAccess.Read, FileShare.Read);
+                    while (stream.Position < stream.Length)
+                    {
+                        BankAccount bankAccount = (BankAccount)formatter.Deserialize(stream);
+                        bankAccounts.Add(bankAccount);
+                    }
+                    stream.Close();
+                    for (int i = 0; i < bankAccounts.Count; i++)
+                    {
+                        if (bankAccounts[i].CardNumber == cardNumber && bankAccounts[i].PinCode == pinCode)
+                        {
+                            bank.Withdraw(bankAccounts[i], withdraw);
+                        }
+                    }
+                    for (int i = 0; i < bankAccounts.Count; i++)
+                    {
+                        IFormatter formatter1 = new BinaryFormatter();
+                        Stream stream1 = new FileStream("MyFile.bin", FileMode.Create, FileAccess.Write, FileShare.None);
+                        formatter.Serialize(stream1, bankAccounts[i]);
+                    }
+                    stream.Close();
+                }
+                else
+                {
+                    Console.WriteLine("Wrong Card number or Pin code");
+                }
             }
         }
     }
