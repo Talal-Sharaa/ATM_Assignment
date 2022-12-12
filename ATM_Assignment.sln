@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ATM_Assignment", "ATM_Assignment\ATM_Assignment.csproj", "{AC28D115-8294-4B28-93FC-4F55CAF8AC47}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ATM_TESTS", "ATM_TESTS\ATM_TESTS.csproj", "{1A03EBFF-E19B-4D10-BC4D-9AEBB942446F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC28D115-8294-4B28-93FC-4F55CAF8AC47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC28D115-8294-4B28-93FC-4F55CAF8AC47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC28D115-8294-4B28-93FC-4F55CAF8AC47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC28D115-8294-4B28-93FC-4F55CAF8AC47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A03EBFF-E19B-4D10-BC4D-9AEBB942446F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A03EBFF-E19B-4D10-BC4D-9AEBB942446F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A03EBFF-E19B-4D10-BC4D-9AEBB942446F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A03EBFF-E19B-4D10-BC4D-9AEBB942446F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C4FDA745-DF2D-46A9-B7EC-676107A0AD23}
+	EndGlobalSection
+EndGlobal
